@@ -1,0 +1,11 @@
+# Example: Bug Fix TDD Rule
+
+When fixing bugs in Python:
+
+1. Write a test that reproduces the bug (it should fail)
+2. Fix the bug with minimal code changes
+3. Verify the test now passes
+4. Add additional tests for edge cases
+5. Refactor if needed while keeping all tests passing
+
+Always maintain high code coverage and document the fix.
