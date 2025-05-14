@@ -10,6 +10,7 @@ A Cookiecutter template for Python projects with automatic Cursor IDE rules inte
 - Makefile for common tasks
 - Pre-configured .gitignore for Python projects
 - Basic pytest setup
+- Complete set of TDD-focused Cursor rules
 
 ## Usage
 
@@ -35,6 +36,21 @@ The template will prompt you for the following variables:
 - `version`: Initial version (default: 0.1.0)
 - `python_version`: Required Python version (default: 3.11)
 - `cursor_rules_repo`: URL of your shared Cursor rules repository
+
+## Available Cursor Rules
+
+The example-cursor-rules/ directory contains a complete set of cursor rules:
+
+| Rule File | Purpose | Auto-Attach | Scope |
+|-----------|---------|-------------|-------|
+| 010-core-python-style.mdc | PEP 8, Black, typing, f-strings | Always applied | All Python files |
+| 020-docstrings.mdc | NumPy-style docstrings | Auto-attach | src/**/*.py |
+| 030-tdd-python.mdc | Test-driven development | Auto-attach | src/**/*.py |
+| 040-bug-fix-tdd.mdc | Bug fix protocol | Agent request trigger | src/**/*.py |
+| 100-pytest-autogen.mdc | Test scaffolding | Agent request trigger | New features |
+| 200-domain-specific.mdc | Business rules | Auto-attach | domain/**/*.py |
+
+📚 Complete cursor rules are included in the template: `{{cookiecutter.project_slug}}/.cursor/rules/`
 
 ## Post-Generation Hook
 
@@ -80,9 +96,18 @@ cookiecutter-python-project/
 │   └── post_gen_project.py       # Automatically adds cursor rules submodule
 ├── {{cookiecutter.project_slug}}/
 │   ├── .cursor/
-│   │   └── rules/                # Placeholder - replaced by submodule
+│   │   └── rules/                # Cursor rules (will be replaced by submodule)
+│   │       ├── 010-core-python-style.mdc
+│   │       ├── 020-docstrings.mdc
+│   │       ├── 030-tdd-python.mdc
+│   │       ├── 040-bug-fix-tdd.mdc
+│   │       ├── 100-pytest-autogen.mdc
+│   │       ├── 200-domain-specific.mdc
+│   │       └── .gitkeep
 │   ├── src/                      # Source code directory
 │   ├── tests/                    # Test directory
+│   │   ├── regressions/          # Bug regression tests
+│   │   └── _bug_template.py      # Template for bug fixes
 │   ├── .gitignore                # Python gitignore
 │   ├── Makefile                  # Common tasks
 │   ├── README.md                 # Project README
@@ -90,11 +115,40 @@ cookiecutter-python-project/
 └── README.md                     # This file
 ```
 
+## Rule Loading Order
+
+Cursor loads rules in alphabetical order by filename. The numbering scheme ensures:
+
+1. **010-020**: Core style rules (always active)
+2. **030-040**: TDD workflow rules (context-sensitive)
+3. **100+**: Feature scaffolding and domain-specific rules
+
+This ordering allows foundational rules to apply first, with more specific rules layering on top.
+
 ## Requirements
 
 - Python 3.7+
 - Git
 - Cookiecutter (`pip install cookiecutter`)
+
+## Getting Started with Cursor Rules
+
+1. The template already includes a complete set of cursor rules
+2. To use them as a shared repository:
+   ```bash
+   # Copy the rules to a new repository
+   cp -r {{cookiecutter.project_slug}}/.cursor/rules/* /path/to/cursor-rules/.cursor/rules/
+   cd /path/to/cursor-rules
+   git init
+   git add .
+   git commit -m "Initial cursor rules"
+   git remote add origin https://github.com/your-org/cursor-rules.git
+   git push -u origin main
+   ```
+
+3. Update the cookiecutter.json file to point to your repository
+
+4. The post-generation hook will automatically replace the local rules with the submodule
 
 ## License
 
