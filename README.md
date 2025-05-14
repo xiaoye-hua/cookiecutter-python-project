@@ -14,12 +14,6 @@ A Cookiecutter template for Python projects with automatic Cursor IDE rules inte
 ## Usage
 
 ```bash
-cookiecutter /Users/hua/Documents/codes_private/cookiecutter-python-project
-```
-
-Or if you host this on GitHub:
-
-```bash
 cookiecutter https://github.com/your-username/cookiecutter-python-project
 ```
 

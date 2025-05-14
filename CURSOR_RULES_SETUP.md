@@ -8,14 +8,14 @@ This guide explains how to create and manage a cursor rules repository for use w
    ```bash
    mkdir cursor-rules
    cd cursor-rules
-   mkdir -p .cursor/rules
+   # Place your .mdc files directly in this directory
    ```
 
 2. **Add your cursor rule files**:
-   Place your `.mdc` files in the `.cursor/rules/` directory. For example:
-   - `.cursor/rules/010-core-python-style.mdc`
-   - `.cursor/rules/020-docstrings.mdc`
-   - `.cursor/rules/030-tdd-python.mdc`
+   Place your `.mdc` files directly in the `cursor-rules/` directory. For example:
+   - `cursor-rules/010-core-python-style.mdc`
+   - `cursor-rules/020-docstrings.mdc`
+   - `cursor-rules/030-tdd-python.mdc`
 
 3. **Initialize Git and push**:
    ```bash
@@ -32,14 +32,12 @@ Here's an example of what your cursor rules repository should look like:
 
 ```
 cursor-rules/
-└── .cursor/
-    └── rules/
-        ├── 010-core-python-style.mdc
-        ├── 020-docstrings.mdc
-        ├── 030-tdd-python.mdc
-        ├── 040-bug-fix-tdd.mdc
-        ├── 100-pytest-autogen.mdc
-        └── 200-domain-specific.mdc
+   ├── 010-core-python-style.mdc
+   ├── 020-docstrings.mdc
+   ├── 030-tdd-python.mdc
+   ├── 040-bug-fix-tdd.mdc
+   ├── 100-pytest-autogen.mdc
+   └── 200-domain-specific.mdc
 ```
 
 ## Using with Cookiecutter
