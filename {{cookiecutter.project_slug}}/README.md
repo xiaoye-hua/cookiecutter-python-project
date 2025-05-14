@@ -19,22 +19,21 @@ This project requires Python {{ cookiecutter.python_version }}
 
 This project includes shared Cursor IDE rules via a git submodule. The rules are located in `.cursor/rules/`.
 
-### Updating Cursor Rules
-
-To update the cursor rules to the latest version from the shared repository:
+### Managing Cursor Rules
 
 ```bash
-git submodule update --remote
-git add .cursor/rules
-git commit -m "Update cursor rules to latest version"
+# Pull latest cursor rules from the remote repository
+make update-cursor-rules
+
+# Push local rule changes back to the cursor-rules repository
+make push-cursor-rule-edits
 ```
 
 ### Adding New Rules
 
-1. Clone the cursor-rules repository: `{{ cookiecutter.cursor_rules_repo }}`
-2. Add or modify rules there
-3. Commit and push your changes
-4. Update this project's submodule using the commands above
+1. Edit or add rules in `.cursor/rules/`
+2. Run `make push-cursor-rule-edits` to push changes
+3. Other projects can pull updates with `make update-cursor-rules`
 
 ## Project Structure
 
@@ -61,4 +60,4 @@ git commit -m "Update cursor rules to latest version"
 
 ## Development
 
-This project was generated with [Cookiecutter](https://github.com/cookiecutter/cookiecutter) and includes automated setup for Cursor IDE rules.
+This project was generated with [Cookiecutter](https://github.com/cookiecutter/cookiecutter) and includes automated setup for Cursor IDE rules via Git submodules.

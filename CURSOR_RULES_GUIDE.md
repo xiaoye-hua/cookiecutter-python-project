@@ -1,64 +1,161 @@
-# Cursor Rules Quick Reference
+# Cursor Rules Guide - Two-Repo Model
 
-## Rule Catalog Overview
+## Overview
 
-| File | ID | Scope | Mode | Purpose |
-|------|-----|-------|------|---------|
-| **010-core-python-style.mdc** | *style* | `src/**/*.py` | Always | PEP 8, Black, typing, f-strings |
-| **020-docstrings.mdc** | *docs* | `src/**/*.py` | Auto | NumPy-style docstrings |
-| **030-tdd-python.mdc** | *tdd* | `src/**/*.py` | Auto | Test-first workflow |
-| **040-bug-fix-tdd.mdc** | *bug-fix* | `src/**/*.py` | Trigger | Bug regression tests |
-| **100-pytest-autogen.mdc** | *scaffold* | *(none)* | Trigger | Test scaffolding |
-| **200-domain-specific.mdc** | *domain* | `domain/**/*.py` | Auto | Business invariants |
+This template uses the two-repo model where cursor rules are:
+- Stored in a separate repository
+- Added to projects as a Git submodule
+- Updated independently from project code
 
-## How Rules Work Together
+## Setup
 
-### Always Active (Foundation)
-- **010**: Ensures consistent Python style across all files
-- Applies Black formatting, type hints, logging, f-strings
+### 1. Create Your Cursor Rules Repository
 
-### Auto-Attached by File Pattern
-- **020**: Adds docstrings when editing any Python file
-- **030**: Enforces TDD when editing src/ files
-- **200**: Applies business rules in domain layer
+```bash
+mkdir cursor-rules
+cd cursor-rules
+mkdir -p .cursor/rules
+# Add your .mdc files to .cursor/rules/
+git init
+git add .
+git commit -m "Initial cursor rules"
+git remote add origin https://github.com/your-org/cursor-rules.git
+git push -u origin main
+```
 
-### Triggered by Request Type
-- **040**: Activates on bug-fix requests
-- **100**: Suggests test scaffolds for new features
+### 2. Configure Cookiecutter
+
+Update `cookiecutter.json` with your cursor rules repository URL:
+
+```json
+{
+    "cursor_rules_repo": "https://github.com/your-org/cursor-rules.git"
+}
+```
+
+### 3. Generate Projects
+
+Projects will automatically include your cursor rules as a submodule.
+
+## Managing Rules
+
+### From Any Project
+
+#### Update to Latest Rules
+```bash
+make update-cursor-rules
+```
+
+This command:
+1. Fetches the latest rules from the remote repository
+2. Updates the submodule reference
+3. Commits the change
+
+#### Push Rule Changes
+```bash
+make push-cursor-rule-edits
+```
+
+This command:
+1. Commits local rule changes
+2. Pushes to the cursor-rules repository
+3. Updates the submodule reference in the project
+
+### Manual Commands
+
+If you prefer manual Git commands:
+
+```bash
+# Update rules
+git submodule update --remote --merge
+git add .cursor/rules
+git commit -m "Update cursor rules"
+
+# Push changes
+cd .cursor/rules
+git add .
+git commit -m "Update rules"
+git push origin main
+cd ../..
+git add .cursor/rules
+git commit -m "Track updated cursor rule pointer"
+```
 
 ## Typical Workflow
 
-1. **New Feature Request**
-   - Rule 100 triggers → suggests test scaffold
-   - Rule 030 enforces → write failing test first
-   - Rule 010 applies → maintain style standards
-   - Rule 020 applies → add proper docstrings
+1. **Edit rules in any project**
+   ```bash
+   cd my-project/.cursor/rules
+   # Edit .mdc files
+   ```
 
-2. **Bug Fix Request**
-   - Rule 040 triggers → create regression test
-   - Follow bug-fix TDD protocol
-   - Document root cause
+2. **Push changes back**
+   ```bash
+   make push-cursor-rule-edits
+   ```
 
-3. **Domain Layer Work**
-   - Rule 200 activates → enforce business rules
-   - Use Decimal for money, UoW for writes
-   - Maintain 1-to-1 Customer-Segment relation
+3. **Update other projects**
+   ```bash
+   cd other-project
+   make update-cursor-rules
+   ```
 
-## Updating Rules
+## Benefits
 
+✅ **Centralized Management**: One source of truth for all rules  
+✅ **Easy Updates**: Pull latest rules with one command  
+✅ **Bidirectional Sync**: Push changes from any project  
+✅ **Version Control**: Full Git history for rule changes  
+✅ **Independent Versioning**: Rules evolve separately from code  
+
+## Troubleshooting
+
+### Submodule Not Found
 ```bash
-# Pull latest rules from central repository
-git submodule update --remote
-
-# Commit the update
-git add .cursor/rules
-git commit -m "Update cursor rules to latest"
+git submodule init
+git submodule update
 ```
 
-## Creating New Rules
+### Merge Conflicts in Rules
+```bash
+cd .cursor/rules
+git status
+# Resolve conflicts
+git add .
+git commit
+```
 
-1. Clone the cursor-rules repository
-2. Add new .mdc file with proper front-matter
-3. Follow naming convention: `XXX-description.mdc`
-4. Test in a project before pushing
-5. Update all projects via submodule update
+### Detached HEAD in Submodule
+```bash
+cd .cursor/rules
+git checkout main
+git pull origin main
+```
+
+## Best Practices
+
+1. **Commit Rule Changes Separately**: Keep rule commits focused
+2. **Use Descriptive Messages**: Explain what changed and why
+3. **Test Before Pushing**: Verify rules work as expected
+4. **Document Complex Rules**: Add comments in .mdc files
+5. **Review Rule Changes**: Consider PR workflow for the cursor-rules repo
+
+## Example Cursor Rules Structure
+
+```
+cursor-rules/
+└── .cursor/
+    └── rules/
+        ├── 010-core-python-style.mdc
+        ├── 020-docstrings.mdc
+        ├── 030-tdd-python.mdc
+        ├── 040-bug-fix-tdd.mdc
+        ├── 100-pytest-autogen.mdc
+        └── 200-domain-specific.mdc
+```
+
+Each rule file includes:
+- Front matter with metadata
+- Clear description
+- Specific instructions
+- Examples when helpful

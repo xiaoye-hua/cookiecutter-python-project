@@ -1,2 +1,7 @@
 # Placeholder for cursor rules
 # This directory will be replaced with a git submodule during project generation
+#
+# The post_gen_project.py hook will:
+# 1. Remove this file
+# 2. Add your cursor-rules repository as a submodule here
+# 3. Commit the changes

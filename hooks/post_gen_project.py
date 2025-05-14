@@ -1,6 +1,7 @@
 import subprocess
 import os
 import sys
+import shutil
 
 def run(cmd, cwd=None):
     """Execute a shell command and handle errors."""
@@ -28,33 +29,26 @@ def init_git_repo(project_dir):
 def add_cursor_rules_submodule(project_dir):
     """Add the cursor-rules repository as a git submodule."""
     repo_url = "{{ cookiecutter.cursor_rules_repo }}"
-    submodule_path = os.path.join(project_dir, ".cursor", "rules")
+    rules_dir = os.path.join(project_dir, ".cursor", "rules")
     
-    # Smart detection: Check if the rules already exist and if they're from the same source
-    if os.path.exists(os.path.join(submodule_path, "010-core-python-style.mdc")):
-        print("Cursor rules already exist in the project.")
-        
-        # Option A: If using the template repo as cursor rules, just use the local files
-        if "cookiecutter-python-project" in repo_url:
-            print("Using the cookiecutter template's cursor rules directly.")
-            print("No submodule needed - the rules are already included.")
-            print("\n💡 Tip: To use a separate cursor-rules repository:")
-            print("   1. Create a new repository for your cursor rules")
-            print("   2. Copy the rules from .cursor/rules/ to your new repository")
-            print("   3. Update to use that repository URL for future projects")
-            return
-        
-        # Option B: If using a different repo, we need to replace with submodule
-        else:
-            print(f"Replacing local rules with submodule from {repo_url}")
-            # Remove from git index first
-            run(f"git rm -rf .cursor/rules", cwd=project_dir)
-            run('git commit -m "Remove template cursor rules to add custom submodule"', cwd=project_dir)
+    # Check if the directory already exists and has content
+    if os.path.exists(rules_dir) and os.listdir(rules_dir):
+        print("Removing existing .cursor/rules directory...")
+        # Remove from git index first
+        run(f"git rm -rf .cursor/rules", cwd=project_dir)
+        # Commit the removal
+        run('git commit -m "Remove placeholder cursor rules"', cwd=project_dir)
+        # Remove the actual directory if it still exists
+        if os.path.exists(rules_dir):
+            shutil.rmtree(rules_dir)
     
-    # Only add submodule if we actually need it
     print(f"Adding cursor-rules submodule from {repo_url}")
+    
+    # Add the submodule
     run(f"git submodule add {repo_url} .cursor/rules", cwd=project_dir)
     run("git submodule update --init --recursive", cwd=project_dir)
+    
+    # Commit the submodule addition
     run("git add .gitmodules .cursor/rules", cwd=project_dir)
     run('git commit -m "Add cursor-rules as submodule"', cwd=project_dir)
 
@@ -70,15 +64,9 @@ def main():
     add_cursor_rules_submodule(project_dir)
     
     print("\n✅ Project setup complete!")
-    
-    # Check if we're using local rules or submodule
-    repo_url = "{{ cookiecutter.cursor_rules_repo }}"
-    if "cookiecutter-python-project" in repo_url:
-        print("📋 Cursor rules are included directly in the project.")
-        print("🌟 These rules are from the cookiecutter template itself.")
-    else:
-        print("📋 Cursor rules have been added as a git submodule.")
-        print("🔄 To update cursor rules in the future, run: git submodule update --remote")
+    print("📋 Cursor rules have been added as a git submodule.")
+    print("🔄 To update cursor rules in the future, run: make update-cursor-rules")
+    print("📤 To push rule changes back, run: make push-cursor-rule-edits")
 
 if __name__ == "__main__":
     main()
